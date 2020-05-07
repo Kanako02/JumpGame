@@ -13,6 +13,7 @@ import com.badlogic.gdx.math.Rectangle
 import com.badlogic.gdx.math.Vector3
 import com.badlogic.gdx.graphics.g2d.BitmapFont
 import java.util.*
+import kotlin.collections.ArrayList
 
 class GameScreen(private val mGame: JumpActionGame) : ScreenAdapter() {
     companion object {
@@ -43,6 +44,8 @@ class GameScreen(private val mGame: JumpActionGame) : ScreenAdapter() {
     private lateinit var mUfo: Ufo
     private lateinit var mPlayer: Player
 
+    private var mEnemy: ArrayList<Enemy> //追加
+
     private var mGameState: Int
     private var mHeightSoFar: Float = 0f
     private var mTouchPoint: Vector3
@@ -65,7 +68,7 @@ class GameScreen(private val mGame: JumpActionGame) : ScreenAdapter() {
         mViewPort = FitViewport(CAMERA_WIDTH, CAMERA_HEIGHT, mCamera)
 
         // GUI用のカメラを設定する
-        mGuiCamera = OrthographicCamera()   // ←追加する
+        mGuiCamera = OrthographicCamera()
         mGuiCamera.setToOrtho(false, GUI_WIDTH, GUI_HEIGHT)
         mGuiViewPort = FitViewport(GUI_WIDTH, GUI_HEIGHT, mGuiCamera)
 
@@ -75,6 +78,8 @@ class GameScreen(private val mGame: JumpActionGame) : ScreenAdapter() {
         mStars = ArrayList<Star>()
         mGameState = GAME_STATE_READY
         mTouchPoint = Vector3()
+
+        mEnemy = ArrayList<Enemy>() //追加
 
         //フォント初期化
         mFont = BitmapFont(Gdx.files.internal("font.fnt"), Gdx.files.internal("font.png"), false)
@@ -123,6 +128,11 @@ class GameScreen(private val mGame: JumpActionGame) : ScreenAdapter() {
             mStars[i].draw(mGame.batch)
         }
 
+        // Enemyを追加
+        for (i in 0 until mEnemy.size) {
+            mEnemy[i].draw(mGame.batch)
+        }
+
         // UFO
         mUfo.draw(mGame.batch)
 
@@ -154,6 +164,7 @@ class GameScreen(private val mGame: JumpActionGame) : ScreenAdapter() {
         val starTexture = Texture("star.png")
         val playerTexture = Texture("uma.png")
         val ufoTexture = Texture("ufo.png")
+        val enemyTexture = Texture("enemy.png") //Enemyの写真　
 
         // StepとStarをゴールの高さまで配置していく
         var y = 0f
@@ -171,6 +182,13 @@ class GameScreen(private val mGame: JumpActionGame) : ScreenAdapter() {
                 val star = Star(starTexture, 0, 0, 72, 72)
                 star.setPosition(step.x + mRandom.nextFloat(), step.y + Star.STAR_HEIGHT + mRandom.nextFloat() * 3)
                 mStars.add(star)
+            }
+
+            //Enemy
+            if (mRandom.nextFloat() > 0.8f) {
+                val enemy = Enemy(enemyTexture, 0, 0, 72, 72)
+                enemy.setPosition(step.x + mRandom.nextFloat(), step.y + Star.STAR_HEIGHT + mRandom.nextFloat() * 3)
+                mEnemy.add(enemy)
             }
 
             y += (maxJumpHeight - 0.5f)
