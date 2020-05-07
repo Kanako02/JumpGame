@@ -266,11 +266,19 @@ class GameScreen(private val mGame: JumpActionGame) : ScreenAdapter() {
     }
 
     private fun checkCollision() {
-        // UFO(ゴールとの当たり判定)
+
+        // Enemyとの当たり判定
+        if (mPlayer.boundingRectangle.overlaps(mEnemy.boundingRectangle)) {
+            mGameState = GAME_STATE_GAMEOVER
+            return
+        }
+
+        //ゴールとの当たり判定
         if (mPlayer.boundingRectangle.overlaps(mUfo.boundingRectangle)) {
             mGameState = GAME_STATE_GAMEOVER
             return
         }
+
 
         // Starとの当たり判定
         for (i in 0 until mStars.size) {
@@ -293,7 +301,8 @@ class GameScreen(private val mGame: JumpActionGame) : ScreenAdapter() {
             }
         }
 
-        // Stepとの当たり判定
+
+
         // 上昇中はStepとの当たり判定を確認しない
         if (mPlayer.velocity.y > 0) {
             return
